@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,13 +13,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView tv = (TextView) findViewById(R.id.text);
-        DoubleClickEvent.doubleOrClickText(MainActivity.this, tv, "触发双击事件");
-        DoubleClickEvent.setSingleClickListener(new DoubleClickEvent.onSingleClickListener() {
+        DoubleClickEvent.doubleOrSingleClickView(tv);
+        DoubleClickEvent.setOnClickListener(new DoubleClickEvent.onSingleOrDoubleClickListener() {
             @Override
-            public void singleClick(View view) {
-                if (view == tv) {
-                    System.out.println(tv.getText().toString());//
+            public void onSingleClick(View view) {
+                if (view instanceof TextView) {
+                    Toast.makeText(MainActivity.this, "点击事件", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            @Override
+            public void onDoubleClick(View view) {
+                Toast.makeText(MainActivity.this, "双击事件", Toast.LENGTH_SHORT).show();
             }
         });
     }

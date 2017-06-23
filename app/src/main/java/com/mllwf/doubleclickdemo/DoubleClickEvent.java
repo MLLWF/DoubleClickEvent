@@ -1,10 +1,7 @@
 package com.mllwf.doubleclickdemo;
 
-import android.content.Context;
 import android.os.Handler;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Created by ML on 2017/4/7.
@@ -12,27 +9,34 @@ import android.widget.Toast;
 
 public class DoubleClickEvent {
 
-    public static long lastClickTime = 0;
+    private static long lastClickTime = 0;
 
-    public interface onDoubleClickListener {
+    private static int type = 1;  //1：单击 2：双击
+
+    public interface onSingleOrDoubleClickListener {
+
         void onSingleClick(View view);
 
         void onDoubleClick(View view);
     }
 
-    public static boolean isDoubleClick() {
+    private static onSingleOrDoubleClickListener onClickListener;
+
+    public static void setOnClickListener(onSingleOrDoubleClickListener listener) {
+        onClickListener = listener;
+    }
+
+    private static boolean isDoubleClick() {
         long currentTime = System.currentTimeMillis();
         final long diffTime = currentTime - lastClickTime;
         lastClickTime = currentTime;
-        if (diffTime > 0 && diffTime < 300) {
+        if (diffTime > 0 && diffTime <= 250) {
             return true;
         }
         return false;
     }
 
-    private static int type = 1;  //1：单击 2：双击
-
-    public static void registerDoubleClickListener(View view, final onDoubleClickListener listener) {
+    private static void registerClickListener(View view, final onSingleOrDoubleClickListener listener) {
         if (view == null || listener == null) {
             return;
         }
@@ -61,37 +65,22 @@ public class DoubleClickEvent {
         });
     }
 
-    //TODO:_____________________________________________________________________________________________________
+    public static void doubleOrSingleClickView(View view) {
 
-    public static void doubleOrClickText(final Context context, TextView textView, final String content) {
-        if (textView == null) {
-            return;
-        }
-        DoubleClickEvent.registerDoubleClickListener(textView, new DoubleClickEvent.onDoubleClickListener() {
+        registerClickListener(view, new onSingleOrDoubleClickListener() {
             @Override
             public void onSingleClick(View view) {
-                if (mListener != null) {
-                    mListener.singleClick(view);
-                } else {
-                    System.out.println("没有注册点击事件");
+                if (onClickListener != null) {
+                    onClickListener.onSingleClick(view);
                 }
             }
 
             @Override
             public void onDoubleClick(View view) {
-                Toast.makeText(context, content, Toast.LENGTH_SHORT).show();
+                if (onClickListener != null) {
+                    onClickListener.onDoubleClick(view);
+                }
             }
         });
     }
-
-    public interface onSingleClickListener {
-        void singleClick(View view);
-    }
-
-    public static onSingleClickListener mListener;
-
-    public static void setSingleClickListener(onSingleClickListener listener) {
-        mListener = listener;
-    }
-
 }
